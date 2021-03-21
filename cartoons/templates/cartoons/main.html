@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link
+            href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+            rel="stylesheet"
+        />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+        />
+    </head>
+    <body>
+        <div id="app">
+            <v-app>
+                <v-main>
+                    <testcard />
+                </v-main>
+            </v-app>
+        </div>
+
+        <!-- Vue Templates -->
+        <template id="testcard">
+            <v-card>
+                <v-img
+                    height="250"
+                    v-bind:src="'.' + $store.state.cartoons[0].final"
+                />
+
+                <v-card-title>Test Cartoon</v-card-title>
+            </v-card>
+        </template>
+
+        <!-- Imports -->
+        <script src="https://unpkg.com/vue"></script>
+        <script src="https://unpkg.com/vue-router"></script>
+        <script src="https://unpkg.com/vuex"></script>
+
+        <!-- Vueify -->
+        <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+        <!-- Vue App -->
+        <script>
+            // Vuex
+            const store = new Vuex.Store({
+                state: {
+                    cartoons: [
+                        {% for cartoon in cartoons %}
+                        {
+                            title: '{{ cartoon.name }}',
+                            author: '{{ cartoon.author }}',
+                            final: '{{ cartoon.final.url }}'
+                        }
+                        {% endfor %}
+                    ]
+                }
+            })
+
+            testcard = Vue.component('testcard', {
+                template: '#testcard'
+            })
+
+            new Vue({
+                store,
+                vuetify: new Vuetify(),
+                delimiters: ['[[', ']]'],
+                methods: {
+                    test: function () {
+                        console.log(store.state.cartoons);
+                    },
+                },
+
+            }).$mount('#app');
+        </script>
+    </body>
+</html>
