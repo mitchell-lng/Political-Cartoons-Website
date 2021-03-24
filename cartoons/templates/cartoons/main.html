@@ -10,9 +10,10 @@
             rel="stylesheet"
         />
         <link
-            href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
             rel="stylesheet"
+            href="https://unpkg.com/buefy/dist/buefy.min.css"
         />
+        <meta charset="utf-8" />
         <meta
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
@@ -20,32 +21,42 @@
     </head>
     <body>
         <div id="app">
-            <v-app>
-                <v-main>
-                    <testcard />
-                </v-main>
-            </v-app>
+            <nav>
+                <ul>
+                    <li>
+                        <router-link to="/">Home</router-link>
+                    </li>
+                </ul>
+            </nav>
+            <br />
+            <router-view></router-view>
         </div>
-
-        <!-- Vue Templates -->
-        <template id="testcard">
-            <v-card>
-                <v-img
-                    height="250"
-                    v-bind:src="'.' + $store.state.cartoons[0].final"
-                />
-
-                <v-card-title>Test Cartoon</v-card-title>
-            </v-card>
-        </template>
 
         <!-- Imports -->
         <script src="https://unpkg.com/vue"></script>
         <script src="https://unpkg.com/vue-router"></script>
         <script src="https://unpkg.com/vuex"></script>
+        <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
 
-        <!-- Vueify -->
-        <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+        <!-- Vue Templates -->
+        <template id="home-page"><h1>Home</h1></template>
+
+        <template id="details-page">
+            <div>
+                <span v-if="$route.params.slug">
+                    <b>
+                        <router-link
+                            v-bind:to="'/cartoon/' + $route.params.slug + '/'"
+                        >
+                            [[
+                            $store.getters.getCartoonBySlug($route.params.slug)['title']
+                            ]]
+                        </router-link>
+                    </b>
+                    ([[ $route.params.slug ]])
+                </span>
+            </div>
+        </template>
 
         <!-- Vue App -->
         <script>
@@ -57,27 +68,57 @@
                         {
                             title: '{{ cartoon.name }}',
                             author: '{{ cartoon.author }}',
-                            final: '{{ cartoon.final.url }}'
-                        }
+                            final: '{{ cartoon.final.url }}',
+                            slug: '{{ cartoon.slug }}',
+                            drafts: [
+                                {% for draft in cartoon.draft_set.all %}
+                                {
+                                    iteration: '{{ draft.iteration }}',
+                                    image: '{{ draft.image.url }}'
+                                },
+                                {% endfor %}
+                            ].sort((a, b) => a.element > b.element).map(i => i.image)
+                        },
                         {% endfor %}
                     ]
+                },
+                getters: {
+                    getCartoonBySlug: (state) => (slug) => {
+                        return state.cartoons.find(element => element.slug === slug)
+                    }
                 }
             })
 
-            testcard = Vue.component('testcard', {
-                template: '#testcard'
+            homePage = Vue.component('home-page', {
+                template: '#home-page'
             })
 
-            new Vue({
-                store,
-                vuetify: new Vuetify(),
+            detailPage = Vue.component('details-page', {
                 delimiters: ['[[', ']]'],
+                props: ['data'],
+                template: '#details-page'
+            })
+
+
+            const routes = [
+                { component: homePage, path: '/' },
+                { component: detailPage, path: '/cartoon/:slug/' }
+            ]
+
+            const router = new VueRouter({
+                mode: 'history',
+                routes: routes
+            })
+
+
+            new Vue({
+                router,
+                store,
                 methods: {
                     test: function () {
                         console.log(store.state.cartoons);
                     },
                 },
-
             }).$mount('#app');
         </script>
     </body>
