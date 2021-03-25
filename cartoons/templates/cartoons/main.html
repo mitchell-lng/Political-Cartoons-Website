@@ -13,6 +13,7 @@
             rel="stylesheet"
             href="https://unpkg.com/buefy/dist/buefy.min.css"
         />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
         <meta charset="utf-8" />
         <meta
             name="viewport"
@@ -21,13 +22,23 @@
     </head>
     <body style="margin: 2vh 2vw">
         <div id="app">
-            <nav>
-                <ul>
-                    <li>
-                        <router-link to="/">Home</router-link>
-                    </li>
-                </ul>
-            </nav>
+            <b-navbar>
+                <template #start>
+                    <b-navbar-item>
+                        <router-link to="/">
+                            Home
+                        </router-link>
+                    </b-navbar-item>
+                    <b-navbar-item href="#">
+                        <router-link to="/about">
+                            About
+                        </router-link>
+                    </b-navbar-item>
+                </template>
+                <template #end>
+                    <search />
+                </template>
+            </b-navbar>
             <br />
             <router-view></router-view>
         </div>
@@ -39,6 +50,15 @@
         <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
 
         <!-- Vue Templates -->
+        <template id="search">
+            <div class="columns">
+                <b-field v-if="visible" class="column" style="margin: 0 20px">
+                    <b-input v-model="input" />
+                </b-field>
+                <b-button @click="toggle" icon-left="magnify" class="margin-top: 20px" />            
+            </div>
+        </template>
+
         <template id="home-page">
             <div>
                 <h1>Cartoons:</h1>
@@ -53,6 +73,12 @@
                         <p style="margin: 20px">----------</p>
                     </li>
                 </ul>
+            </div>
+        </template>
+
+        <template id="about-page">
+            <div>
+                <h1>About</h1>
             </div>
         </template>
 
@@ -106,9 +132,30 @@
                 }
             })
 
+            searchBar = Vue.component('search', {
+                delimiters: ['[[', ']]'],
+                data: function() {
+                    return {
+                        visible: false,
+                        input: ''
+                    }
+                },
+                methods: {
+                    toggle: function() {
+                        this.visible = !this.visible
+                    }
+                },
+                template: '#search'
+            })
+
             homePage = Vue.component('home-page', {
                 delimiters: ['[[', ']]'],
                 template: '#home-page'
+            })
+
+            aboutPage = Vue.component('about-page', {
+                delimiters: ['[[', ']]'],
+                template: '#about-page'
             })
 
             detailPage = Vue.component('details-page', {
@@ -124,6 +171,7 @@
 
             const routes = [
                 { component: homePage, path: '/' },
+                { component: aboutPage, path: '/about' },
                 { component: detailPage, path: '/cartoon/:slug/' }
             ]
 
