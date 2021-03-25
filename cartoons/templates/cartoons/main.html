@@ -19,7 +19,7 @@
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
         />
     </head>
-    <body>
+    <body style="margin: 2vh 2vw">
         <div id="app">
             <nav>
                 <ul>
@@ -39,22 +39,39 @@
         <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
 
         <!-- Vue Templates -->
-        <template id="home-page"><h1>Home</h1></template>
+        <template id="home-page">
+            <div>
+                <h1>Cartoons:</h1>
+                <ul>
+                    <li v-for="cartoon in $store.state.cartoons" v-bind:key="cartoon.slug">
+                        <router-link v-bind:to="`cartoon/${cartoon.slug}`">
+                            <p>
+                                [[ cartoon.title ]] by [[ cartoon.author ]]
+                            </p>
+                            <img v-bind:alt="cartoon.title" width="250" height="250" v-bind:src="cartoon.final" />
+                        </router-link>
+                        <p style="margin: 20px">----------</p>
+                    </li>
+                </ul>
+            </div>
+        </template>
 
         <template id="details-page">
             <div>
-                <span v-if="$route.params.slug">
-                    <b>
-                        <router-link
-                            v-bind:to="'/cartoon/' + $route.params.slug + '/'"
-                        >
-                            [[
-                            $store.getters.getCartoonBySlug($route.params.slug)['title']
-                            ]]
-                        </router-link>
-                    </b>
-                    ([[ $route.params.slug ]])
-                </span>
+                <h2>[[ data.title ]] by [[ data.author ]]</h4>
+                <h4>Final:</h4>
+                <img width="300" height="300" v-bind:alt="data.title" v-bind:src="data.final" />
+                <br />
+                <h4>Drafts:</h4>
+                <ul>
+                    <li
+                        v-for="(draft, index) in data.drafts"
+                        v-bind:key="index"
+                    >
+                        <h6>[[ index + 1 ]]</h6>
+                        <img width="250" height="250" v-bind:src="draft" />
+                    </li>
+                </ul>
             </div>
         </template>
 
@@ -66,9 +83,9 @@
                     cartoons: [
                         {% for cartoon in cartoons %}
                         {
-                            title: '{{ cartoon.name }}',
+                            title: '{{ cartoon.title }}',
                             author: '{{ cartoon.author }}',
-                            final: '{{ cartoon.final.url }}',
+                            final: '{{ cartoon.image.url }}',
                             slug: '{{ cartoon.slug }}',
                             drafts: [
                                 {% for draft in cartoon.draft_set.all %}
@@ -90,12 +107,17 @@
             })
 
             homePage = Vue.component('home-page', {
+                delimiters: ['[[', ']]'],
                 template: '#home-page'
             })
 
             detailPage = Vue.component('details-page', {
                 delimiters: ['[[', ']]'],
-                props: ['data'],
+                computed: {
+                    data: function() {
+                        return store.getters.getCartoonBySlug(this.$route.params.slug)
+                    }
+                },
                 template: '#details-page'
             })
 
