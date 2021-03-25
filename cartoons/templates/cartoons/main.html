@@ -20,27 +20,48 @@
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
         />
     </head>
-    <body style="margin: 2vh 2vw">
+    <body>
         <div id="app">
-            <b-navbar>
-                <template #start>
-                    <b-navbar-item>
-                        <router-link to="/">
-                            Home
-                        </router-link>
-                    </b-navbar-item>
-                    <b-navbar-item href="#">
-                        <router-link to="/about">
-                            About
-                        </router-link>
-                    </b-navbar-item>
-                </template>
-                <template #end>
-                    <search />
-                </template>
-            </b-navbar>
+            <nav class="navbar is-warning p-0 m-0" role="navigation" aria-label="main navigation">
+                <div class="container">
+                  <div class="navbar-brand">
+                    <a
+                      role="button"
+                      class="navbar-burger"
+                      aria-label="menu"
+                      id="burger"
+                      aria-expanded="false"
+                      data-target="navbar"
+                      v-on:click="toggleBurger()"
+                    >
+                      <span aria-hidden="true"></span>
+                      <span aria-hidden="true"></span>
+                      <span aria-hidden="true"></span>
+                    </a>
+                  </div>
+            
+                  <div id="navbar" class="navbar-menu">
+                    <p class="navbar-item has-text-dark has-text-weight-bold">HTHM Political Cartoons</p>
+                    <router-link class="navbar-item" to="/">Home</router-link>
+                    <router-link class="navbar-item" to="/about">About</router-link>
+            
+                    <div class="navbar-end">
+                        <search class="navbar-item" />
+                    </div>
+                  </div>
+                </div>
+              </nav>
             <br />
-            <router-view></router-view>
+            <div class="container">
+                <router-view></router-view>
+            </div>
+            <footer class="footer">
+                <div class="content has-text-centered">
+                  <p>
+                    2021 Political Cartoons, a HTHM Project. Proudly Done by Lexi Wiggins 10th grade students.
+                  </p>
+                </div>
+            </footer>
         </div>
 
         <!-- Imports -->
@@ -52,50 +73,79 @@
         <!-- Vue Templates -->
         <template id="search">
             <div class="columns">
-                <b-field v-if="visible" class="column" style="margin: 0 20px">
+                <b-field class="column m-0 mr-5 p-3">
                     <b-input v-model="input" />
-                </b-field>
-                <b-button @click="toggle" icon-left="magnify" class="margin-top: 20px" />            
+                </b-field>        
             </div>
         </template>
 
         <template id="home-page">
-            <div>
-                <h1>Cartoons:</h1>
-                <ul>
-                    <li v-for="cartoon in $store.state.cartoons" v-bind:key="cartoon.slug">
+            <div class="section">
+                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>Cartoons</i></h1>
+                <ul class="columns is-multiline mt-5 is-centered">
+                    <li v-for="cartoon in $store.state.cartoons" v-bind:key="cartoon.slug" class="column is-one-quarter m-1 card">
                         <router-link v-bind:to="`cartoon/${cartoon.slug}`">
-                            <p>
-                                [[ cartoon.title ]] by [[ cartoon.author ]]
-                            </p>
-                            <img v-bind:alt="cartoon.title" width="250" height="250" v-bind:src="cartoon.final" />
+                            <div class="card-image">
+                                <figure class="image square">
+                                    <img v-bind:alt="cartoon.title" v-bind:src="cartoon.final" />
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                <div class="content">
+                                    <p class="subtitle has-text-link">
+                                        [[ cartoon.title ]] by [[ cartoon.author ]]
+                                    </p>
+                                    <p>----------</p>
+                                </div>
+                            </div>
                         </router-link>
-                        <p style="margin: 20px">----------</p>
                     </li>
                 </ul>
             </div>
         </template>
 
         <template id="about-page">
-            <div>
-                <h1>About</h1>
+            <div class="section">
+                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>About</i></h1>
+                <div class="content">
+                    <h2>This Project</h2>
+                    <p>This is a project done by the 10th grade of HTHM. In this project we were supposed to find a project that was interesting to us and research it. From here we were supposed to use satire to make a political cartoon to pursuade others into finding out more about our event. And if you're reading this, then we probably did just that.</p>
+                    <h2>The Why</h2>
+                    <p>I can't think right now so I have no idea what we should put here but this is some text, so it takes up some spaceeeeeeeeeee. :)</p>
+                </div>
             </div>
         </template>
 
         <template id="details-page">
-            <div>
-                <h2>[[ data.title ]] by [[ data.author ]]</h4>
-                <h4>Final:</h4>
-                <img width="300" height="300" v-bind:alt="data.title" v-bind:src="data.final" />
-                <br />
-                <h4>Drafts:</h4>
-                <ul>
+            <div class="section">
+                <div class="columns">
+                    <div class="column is-two-thirds">
+                        <img v-bind:alt="data.title" v-bind:src="data.final" class="box" />
+                        
+                    </div>
+                    <div class="is-one-quarter ml-4">
+                        <h2 class="title">[[ data.title ]] by [[ data.author ]]</h2>
+                        <h4 class="subtitle">Final Product</h4>
+                    </div>
+                </div>
+                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>Drafts</i></h1>
+                <ul class="columns is-multiline is-centered">
                     <li
                         v-for="(draft, index) in data.drafts"
                         v-bind:key="index"
+                        class="card column is-one-third m-2"
                     >
-                        <h6>[[ index + 1 ]]</h6>
-                        <img width="250" height="250" v-bind:src="draft" />
+                        <div class="card-image">
+                            <figure class="image">
+                                <img v-bind:src="draft" />
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <d class="content">
+                                <h6>Draft #[[ index + 1 ]]</h6>
+                            </d>
+                        </div>
+                        
                     </li>
                 </ul>
             </div>
@@ -187,6 +237,10 @@
                 methods: {
                     test: function () {
                         console.log(store.state.cartoons);
+                    },
+                    toggleBurger: function () {
+                        document.getElementById("burger").classList.toggle("is-active");
+                        document.getElementById("navbar").classList.toggle("is-active");
                     },
                 },
             }).$mount('#app');
