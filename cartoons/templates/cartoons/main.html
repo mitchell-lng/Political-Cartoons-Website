@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Political Cartoons</title>
+
         <link
             href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
             rel="stylesheet"
         />
         <link
-            href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css"
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
             rel="stylesheet"
         />
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/buefy/dist/buefy.min.css"
         />
         <meta charset="utf-8" />
         <meta
@@ -49,15 +55,15 @@
                         >
                             HTHM Political Cartoons
                         </p>
-                        <router-link class="navbar-item" to="/"
-                            >Home</router-link
+                        <router-link class="navbar-item" to="/">
+                            Home</router-link
                         >
-                        <router-link class="navbar-item" to="/about"
-                            >About</router-link
+                        <router-link class="navbar-item" to="/about">
+                            About</router-link
                         >
 
                         <div class="navbar-end">
-                            <!-- <search class="navbar-item" /> -->
+                            <search-bar />
                         </div>
                     </div>
                 </div>
@@ -80,13 +86,26 @@
         <script src="https://unpkg.com/vue"></script>
         <script src="https://unpkg.com/vue-router"></script>
         <script src="https://unpkg.com/vuex"></script>
+        <script src="https://unpkg.com/buefy/dist/components/autocomplete"></script>
 
         <!-- Vue Templates -->
         <template id="search-bar">
-            <div class="columns">
-                <b-field class="column m-0 mr-5 p-3">
-                    <b-input v-model="input" />
-                </b-field>
+            <div class="navbar-item">
+                <b-autocomplete
+                    class="navbar-item"
+                    rounded
+                    v-model="input"
+                    group-field="type"
+                    group-options="items"
+                    v-bind:data="filteredDataArray"
+                    placeholder="Search term"
+                    @select="option => selected = option"
+                    @typing="option => input = option"
+                    @keyup.enter.native="search"
+                >
+                    <template #empty>No results found</template>
+                </b-autocomplete>
+                <span class="navbar-item material-icons" @click="search">search</span>
             </div>
         </template>
 
@@ -97,7 +116,7 @@
                     v-bind:key="cartoon.slug"
                     class="column is-one-quarter m-1 card"
                 >
-                    <router-link v-bind:to="`cartoon/${cartoon.slug}`">
+                    <router-link v-bind:to="`/cartoon/${cartoon.slug}`">
                         <div class="card-image">
                             <figure class="image square">
                                 <img
@@ -111,7 +130,6 @@
                                 <p class="subtitle has-text-link">
                                     [[ cartoon.title ]] by [[ cartoon.author ]]
                                 </p>
-                                <p>----------</p>
                             </div>
                         </div>
                     </router-link>
@@ -237,6 +255,12 @@
                 getters: {
                     getCartoonBySlug: (state) => (slug) => {
                         return state.cartoons.find(element => element.slug === slug)
+                    },
+                    getAllCartoonTitles: (state) => (slug) => {
+                        return state.cartoons.map(element => element.title)
+                    },
+                    getAllCartoonAuthors: (state) => (slug) => {
+                        return state.cartoons.map(element => element.author)
                     }
                 }
             })
@@ -245,13 +269,49 @@
                 delimiters: ['[[', ']]'],
                 data: function() {
                     return {
-                        visible: false,
-                        input: ''
+                        data:  [
+                            {
+                                type: 'Titles',
+                                items: store.getters.getAllCartoonTitles()
+                            },
+                            {
+                                type: 'Authors',
+                                items: store.getters.getAllCartoonAuthors()
+                            }
+                        ],
+                        input: '',
+                        selected: '',
+                    }
+                },
+                computed: {
+                    filteredDataArray() {
+                        const newData = []
+                        this.data.forEach(element => {
+                            const items = element.items.filter(item =>
+                                item.toLowerCase().indexOf(this.input.toLowerCase()) >= 0)
+                            if (items.length) {
+                                newData.push({ type: element.type, items})
+                            }
+                        })
+
+                        return newData
                     }
                 },
                 methods: {
                     toggle: function() {
                         this.visible = !this.visible
+                    },
+                    search: function() {
+                        let term = ''
+                        let type = ''
+
+                        if (this.selected === null) {
+                            term = this.input
+                        } else {
+                            term = this.selected
+                        }
+
+                        this.$router.push(`/search/${term}`)
                     }
                 },
                 template: '#search-bar'
