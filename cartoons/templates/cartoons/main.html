@@ -24,6 +24,33 @@
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
         />
+        <style>
+            #scottmademegivethisanid:hover {
+                cursor: pointer;
+            }
+            #nav-search {
+                background-color: transparent;
+                border: none;
+                border-bottom: 1px solid black;
+                border-radius: 0;
+                outline: none;
+                box-shadow: none;   
+                color: black !important;
+            }
+
+            ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+                color: #777 !important;
+                opacity: 1; /* Firefox */
+                }
+
+                :-ms-input-placeholder { /* Internet Explorer 10-11 */
+                    color: #777 !important;
+                }
+
+                ::-ms-input-placeholder { /* Microsoft Edge */
+                    color: #777 !important;
+                }
+        </style>
     </head>
     <body>
         <div id="app">
@@ -87,37 +114,25 @@
         <script src="https://unpkg.com/vue-router"></script>
         <script src="https://unpkg.com/vuex"></script>
         <script src="https://unpkg.com/buefy/dist/components/autocomplete"></script>
-        <script src="https://unpkg.com/buefy/dist/components/switch"></script>
 
         <!-- Vue Templates -->
         <template id="search-bar">
             <div class="navbar-item">
                 <b-autocomplete
                     class="navbar-item"
-                    rounded
+                    id="nav-search"
                     v-model="input"
                     group-field="type"
                     group-options="items"
                     v-bind:data="filteredDataArray"
                     placeholder="Search term"
-                    @select="option => selected = option"
+                    @select="option => {selected = option; search()}"
                     @typing="option => selected = option"
                     @keyup.enter.native="search"
                 >
                     <template #empty>No results found</template>
                 </b-autocomplete>
-                <div class="columns navbar-item" style="margin-top: 10px;">
-                    <p class="column navbar-item">Title</p>
-                    <b-switch
-                        class="column navbar-item"
-                        rounded
-                        passive-type="is-primary"
-                        v-model="type"
-                    />
-                    <p class="column navbar-item">Author</p>
-                </div>
-
-                <span class="navbar-item material-icons" @click="search"
+                <span class="navbar-item material-icons" id="scottmademegivethisanid" @click="search"
                     >search</span
                 >
             </div>
@@ -237,7 +252,7 @@
         </template>
 
         <template id="search-page">
-            <div>
+            <div class="section">
                 <cartoon-list v-bind:data="results" />
             </div>
         </template>
@@ -295,7 +310,6 @@
                         ],
                         input: '',
                         selected: '',
-                        type: false
                     }
                 },
                 computed: {
@@ -325,7 +339,7 @@
                             term = this.selected
                         }
 
-                        this.$router.push(`/search/${term ? 'author/' : ''}${term}`)
+                        this.$router.push(`/search/${term}`)
                     }
                 },
                 template: '#search-bar'
@@ -361,8 +375,11 @@
                 delimiters: ['[[', ']]'],
                 computed: {
                     results: function() {
-                        const type = this.$route.path.split('/').length == 3 ? 'title' : 'author'
-                        return store.state.cartoons.filter(element => element[type].toLowerCase().includes(this.$route.params.term.toLowerCase()))
+                        let set = new Set(store.state.cartoons.filter(element => element.title.toLowerCase().includes(this.$route.params.term.toLowerCase())))
+                        store.state.cartoons.filter(element => element.author.toLowerCase().includes(this.$route.params.term.toLowerCase())).forEach(item => {
+                            set.add(item)
+                        })
+                        return set
                     }
                 },
 
