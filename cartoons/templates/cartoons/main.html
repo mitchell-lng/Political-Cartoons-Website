@@ -87,6 +87,7 @@
         <script src="https://unpkg.com/vue-router"></script>
         <script src="https://unpkg.com/vuex"></script>
         <script src="https://unpkg.com/buefy/dist/components/autocomplete"></script>
+        <script src="https://unpkg.com/buefy/dist/components/switch"></script>
 
         <!-- Vue Templates -->
         <template id="search-bar">
@@ -100,12 +101,25 @@
                     v-bind:data="filteredDataArray"
                     placeholder="Search term"
                     @select="option => selected = option"
-                    @typing="option => input = option"
+                    @typing="option => selected = option"
                     @keyup.enter.native="search"
                 >
                     <template #empty>No results found</template>
                 </b-autocomplete>
-                <span class="navbar-item material-icons" @click="search">search</span>
+                <div class="columns navbar-item" style="margin-top: 10px;">
+                    <p class="column navbar-item">Title</p>
+                    <b-switch
+                        class="column navbar-item"
+                        rounded
+                        passive-type="is-primary"
+                        v-model="type"
+                    />
+                    <p class="column navbar-item">Author</p>
+                </div>
+
+                <span class="navbar-item material-icons" @click="search"
+                    >search</span
+                >
             </div>
         </template>
 
@@ -281,6 +295,7 @@
                         ],
                         input: '',
                         selected: '',
+                        type: false
                     }
                 },
                 computed: {
@@ -303,7 +318,6 @@
                     },
                     search: function() {
                         let term = ''
-                        let type = ''
 
                         if (this.selected === null) {
                             term = this.input
@@ -311,7 +325,7 @@
                             term = this.selected
                         }
 
-                        this.$router.push(`/search/${term}`)
+                        this.$router.push(`/search/${term ? 'author/' : ''}${term}`)
                     }
                 },
                 template: '#search-bar'
