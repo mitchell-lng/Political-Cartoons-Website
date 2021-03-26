@@ -11,9 +11,8 @@
         />
         <link
             rel="stylesheet"
-            href="https://unpkg.com/buefy/dist/buefy.min.css"
+            href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css"
         />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
         <meta charset="utf-8" />
         <meta
             name="viewport"
@@ -22,44 +21,57 @@
     </head>
     <body>
         <div id="app">
-            <nav class="navbar is-warning p-0 m-0" role="navigation" aria-label="main navigation">
+            <nav
+                class="navbar is-warning p-0 m-0"
+                role="navigation"
+                aria-label="main navigation"
+            >
                 <div class="container">
-                  <div class="navbar-brand">
-                    <a
-                      role="button"
-                      class="navbar-burger"
-                      aria-label="menu"
-                      id="burger"
-                      aria-expanded="false"
-                      data-target="navbar"
-                      v-on:click="toggleBurger()"
-                    >
-                      <span aria-hidden="true"></span>
-                      <span aria-hidden="true"></span>
-                      <span aria-hidden="true"></span>
-                    </a>
-                  </div>
-            
-                  <div id="navbar" class="navbar-menu">
-                    <p class="navbar-item has-text-dark has-text-weight-bold">HTHM Political Cartoons</p>
-                    <router-link class="navbar-item" to="/">Home</router-link>
-                    <router-link class="navbar-item" to="/about">About</router-link>
-            
-                    <div class="navbar-end">
-                        <search class="navbar-item" />
+                    <div class="navbar-brand">
+                        <a
+                            role="button"
+                            class="navbar-burger"
+                            aria-label="menu"
+                            id="burger"
+                            aria-expanded="false"
+                            data-target="navbar"
+                            v-on:click="toggleBurger()"
+                        >
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                        </a>
                     </div>
-                  </div>
+
+                    <div id="navbar" class="navbar-menu">
+                        <p
+                            class="navbar-item has-text-dark has-text-weight-bold"
+                        >
+                            HTHM Political Cartoons
+                        </p>
+                        <router-link class="navbar-item" to="/"
+                            >Home</router-link
+                        >
+                        <router-link class="navbar-item" to="/about"
+                            >About</router-link
+                        >
+
+                        <div class="navbar-end">
+                            <!-- <search class="navbar-item" /> -->
+                        </div>
+                    </div>
                 </div>
-              </nav>
+            </nav>
             <br />
             <div class="container">
                 <router-view></router-view>
             </div>
             <footer class="footer">
                 <div class="content has-text-centered">
-                  <p>
-                    2021 Political Cartoons, a HTHM Project. Proudly Done by Lexi Wiggins 10th grade students.
-                  </p>
+                    <p>
+                        2021 Political Cartoons, a HTHM Project. Proudly Done by
+                        Lexi Wiggins 10th grade students.
+                    </p>
                 </div>
             </footer>
         </div>
@@ -68,50 +80,82 @@
         <script src="https://unpkg.com/vue"></script>
         <script src="https://unpkg.com/vue-router"></script>
         <script src="https://unpkg.com/vuex"></script>
-        <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
 
         <!-- Vue Templates -->
-        <template id="search">
+        <template id="search-bar">
             <div class="columns">
                 <b-field class="column m-0 mr-5 p-3">
                     <b-input v-model="input" />
-                </b-field>        
+                </b-field>
             </div>
+        </template>
+
+        <template id="cartoon-list">
+            <ul class="columns is-multiline mt-5 is-centered">
+                <li
+                    v-for="cartoon in data"
+                    v-bind:key="cartoon.slug"
+                    class="column is-one-quarter m-1 card"
+                >
+                    <router-link v-bind:to="`cartoon/${cartoon.slug}`">
+                        <div class="card-image">
+                            <figure class="image square">
+                                <img
+                                    v-bind:alt="cartoon.title"
+                                    v-bind:src="cartoon.final"
+                                />
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="content">
+                                <p class="subtitle has-text-link">
+                                    [[ cartoon.title ]] by [[ cartoon.author ]]
+                                </p>
+                                <p>----------</p>
+                            </div>
+                        </div>
+                    </router-link>
+                </li>
+            </ul>
         </template>
 
         <template id="home-page">
             <div class="section">
-                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>Cartoons</i></h1>
-                <ul class="columns is-multiline mt-5 is-centered">
-                    <li v-for="cartoon in $store.state.cartoons" v-bind:key="cartoon.slug" class="column is-one-quarter m-1 card">
-                        <router-link v-bind:to="`cartoon/${cartoon.slug}`">
-                            <div class="card-image">
-                                <figure class="image square">
-                                    <img v-bind:alt="cartoon.title" v-bind:src="cartoon.final" />
-                                </figure>
-                            </div>
-                            <div class="card-content">
-                                <div class="content">
-                                    <p class="subtitle has-text-link">
-                                        [[ cartoon.title ]] by [[ cartoon.author ]]
-                                    </p>
-                                    <p>----------</p>
-                                </div>
-                            </div>
-                        </router-link>
-                    </li>
-                </ul>
+                <h1
+                    class="title block has-text-centered has-text-dark"
+                    style="text-transform: uppercase"
+                >
+                    <i>Cartoons</i>
+                </h1>
+                <cartoon-list v-bind:data="$store.state.cartoons" />
             </div>
         </template>
 
         <template id="about-page">
             <div class="section">
-                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>About</i></h1>
+                <h1
+                    class="title block has-text-centered has-text-dark"
+                    style="text-transform: uppercase"
+                >
+                    <i>About</i>
+                </h1>
                 <div class="content">
                     <h2>This Project</h2>
-                    <p>This is a project done by the 10th grade of HTHM. In this project we were supposed to find a project that was interesting to us and research it. From here we were supposed to use satire to make a political cartoon to pursuade others into finding out more about our event. And if you're reading this, then we probably did just that.</p>
+                    <p>
+                        This is a project done by the 10th grade of HTHM. In
+                        this project we were supposed to find a project that was
+                        interesting to us and research it. From here we were
+                        supposed to use satire to make a political cartoon to
+                        pursuade others into finding out more about our event.
+                        And if you're reading this, then we probably did just
+                        that.
+                    </p>
                     <h2>The Why</h2>
-                    <p>I can't think right now so I have no idea what we should put here but this is some text, so it takes up some spaceeeeeeeeeee. :)</p>
+                    <p>
+                        I can't think right now so I have no idea what we should
+                        put here but this is some text, so it takes up some
+                        spaceeeeeeeeeee. :)
+                    </p>
                 </div>
             </div>
         </template>
@@ -120,15 +164,25 @@
             <div class="section">
                 <div class="columns">
                     <div class="column is-two-thirds">
-                        <img v-bind:alt="data.title" v-bind:src="data.final" class="box" />
-                        
+                        <img
+                            v-bind:alt="data.title"
+                            v-bind:src="data.final"
+                            class="box"
+                        />
                     </div>
                     <div class="is-one-quarter ml-4">
-                        <h2 class="title">[[ data.title ]] by [[ data.author ]]</h2>
+                        <h2 class="title">
+                            [[ data.title ]] by [[ data.author ]]
+                        </h2>
                         <h4 class="subtitle">Final Product</h4>
                     </div>
                 </div>
-                <h1 class="title block has-text-centered has-text-dark" style="text-transform: uppercase;"><i>Drafts</i></h1>
+                <h1
+                    class="title block has-text-centered has-text-dark"
+                    style="text-transform: uppercase"
+                >
+                    <i>Drafts</i>
+                </h1>
                 <ul class="columns is-multiline is-centered">
                     <li
                         v-for="(draft, index) in data.drafts"
@@ -145,9 +199,14 @@
                                 <h6>Draft #[[ index + 1 ]]</h6>
                             </d>
                         </div>
-                        
                     </li>
                 </ul>
+            </div>
+        </template>
+
+        <template id="search-page">
+            <div>
+                <cartoon-list v-bind:data="results" />
             </div>
         </template>
 
@@ -182,7 +241,7 @@
                 }
             })
 
-            searchBar = Vue.component('search', {
+            searchBar = Vue.component('search-bar', {
                 delimiters: ['[[', ']]'],
                 data: function() {
                     return {
@@ -195,7 +254,13 @@
                         this.visible = !this.visible
                     }
                 },
-                template: '#search'
+                template: '#search-bar'
+            })
+
+            cartoonList = Vue.component('cartoon-list', {
+                delimiters: ['[[', ']]'],
+                props: ['data'],
+                template: '#cartoon-list'
             })
 
             homePage = Vue.component('home-page', {
@@ -218,11 +283,25 @@
                 template: '#details-page'
             })
 
+            searchPage = Vue.component('search-page', {
+                delimiters: ['[[', ']]'],
+                computed: {
+                    results: function() {
+                        const type = this.$route.path.split('/').length == 3 ? 'title' : 'author'
+                        return store.state.cartoons.filter(element => element[type].toLowerCase().includes(this.$route.params.term.toLowerCase()))
+                    }
+                },
+
+                template: '#search-page'
+            })
+
 
             const routes = [
                 { component: homePage, path: '/' },
                 { component: aboutPage, path: '/about' },
-                { component: detailPage, path: '/cartoon/:slug/' }
+                { component: detailPage, path: '/cartoon/:slug/' },
+                { component: searchPage, path: '/search/:term/' },
+                { component: searchPage, path: '/search/author/:term/' }
             ]
 
             const router = new VueRouter({
